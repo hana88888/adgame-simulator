@@ -1,7 +1,5 @@
 // src/types/index.ts
 
-// プロジェクト全体で使う「型」をここに定義して、export（外部公開）します
-
 export type Scenario = {
   id: number;
   title: string;
