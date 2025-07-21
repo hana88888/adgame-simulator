@@ -1,24 +1,20 @@
+
 // src/components/GameScreen.tsx
 
 'use client';
 
 import { useState } from 'react';
 
-// --- ここから型定義を追加 ---
-// シナリオデータの「型」を定義
+// ... (型の定義、定数の定義は変更なし) ...
 type Scenario = {
   id: number;
   title: string;
   difficulty: string;
 };
-
-// GameScreenコンポーネントが受け取るPropsの「型」を定義
 type GameScreenProps = {
-  scenario: Scenario; // scenarioは上記のScenario型
-  onBack: () => void; // onBackは引数なし・戻り値なしの関数
+  scenario: Scenario;
+  onBack: () => void;
 };
-// --- ここまで型定義を追加 ---
-
 const AVAILABLE_TAGS = ['20代女性', '30代男性', '学生', '主婦', 'ファッション', 'ガジェット', '都心在住', '地方在住', 'アウトドア', 'インドア'];
 const CREATIVE_CARDS = [
   { id: 1, title: 'A: 若者向け画像', description: 'インパクト重視のビジュアル' },
@@ -26,24 +22,29 @@ const CREATIVE_CARDS = [
   { id: 3, title: 'C: 機能性アピール', description: '製品の特長をテキストで訴求' },
 ];
 
-// コンポーネントの引数に、作成した型を適用する
+
 export default function GameScreen({ scenario, onBack }: GameScreenProps) {
   const [day, setDay] = useState(1);
   const [budget, setBudget] = useState(100000);
   const [gameOver, setGameOver] = useState(false);
   const [bidAmount, setBidAmount] = useState(100);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [selectedCreativeId, setSelectedCreativeId] = useState(null);
+  
+  // --- ここを修正 ---
+  // useStateに「これは文字列の配列です」と型を教える
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // -----------------
+
+  const [selectedCreativeId, setSelectedCreativeId] = useState<number | null>(null);
   const [dailyResult, setDailyResult] = useState(null);
 
-  const handleTagToggle = (tag: string) => { // tagにも型を指定
+  // ... (handleTagToggle, handleRunDay 関数は変更なし) ...
+  const handleTagToggle = (tag: string) => {
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter((t) => t !== tag));
     } else {
       setSelectedTags([...selectedTags, tag]);
     }
   };
-
   const handleRunDay = () => {
     const impressions = 10000;
     const clickRate = selectedCreativeId === 1 ? 0.05 : 0.02;
@@ -67,7 +68,6 @@ export default function GameScreen({ scenario, onBack }: GameScreenProps) {
       }
       return newDay;
     });
-
     setBudget(prevBudget => {
       const newBudget = prevBudget - cost;
       if (newBudget <= 0) {
@@ -77,8 +77,9 @@ export default function GameScreen({ scenario, onBack }: GameScreenProps) {
     });
   };
 
+
   return (
-    // ... (returnの中身は変更なし) ...
+    // ... (returnの中身も変更なし) ...
     <div>
       <h2 className="text-2xl font-bold text-slate-800 mb-4">
         {scenario.title}
