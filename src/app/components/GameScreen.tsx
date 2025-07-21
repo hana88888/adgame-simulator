@@ -2,8 +2,6 @@
 
 'use client';
 
-// ... (useState, AVAILABLE_TAGS, CREATIVE_CARDS の定義は変更なし) ...
-
 import { useState } from 'react';
 
 const AVAILABLE_TAGS = ['20代女性', '30代男性', '学生', '主婦', 'ファッション', 'ガジェット', '都心在住', '地方在住', 'アウトドア', 'インドア'];
@@ -13,8 +11,10 @@ const CREATIVE_CARDS = [
   { id: 3, title: 'C: 機能性アピール', description: '製品の特長をテキストで訴求' },
 ];
 
-
 export default function GameScreen({ scenario, onBack }) {
+  const [day, setDay] = useState(1);
+  const [budget, setBudget] = useState(100000);
+  const [gameOver, setGameOver] = useState(false);
   const [bidAmount, setBidAmount] = useState(100);
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedCreativeId, setSelectedCreativeId] = useState(null);
@@ -28,6 +28,7 @@ export default function GameScreen({ scenario, onBack }) {
     }
   };
 
+  // 「1日運用する」ボタンが押されたときの処理（修正版）
   const handleRunDay = () => {
     // --- シミュレーションロジック ---
     const impressions = 10000;
@@ -37,25 +38,32 @@ export default function GameScreen({ scenario, onBack }) {
     const conversions = Math.floor(clicks * conversionRate);
     const cost = clicks * bidAmount;
     
-    // 新しい指標の計算
-    const averageOrderValue = 15000; // 顧客一人当たりの平均売上を仮定
-    const revenue = conversions * averageOrderValue; // 売上
-    const cpm = (cost / impressions) * 1000; // CPM
-    const cpa = conversions > 0 ? cost / conversions : 0; // CPA (0除算を回避)
-    const roas = cost > 0 ? (revenue / cost) * 100 : 0; // ROAS (0除算を回避)
+    const averageOrderValue = 15000;
+    const revenue = conversions * averageOrderValue;
+    const cpm = (cost / impressions) * 1000;
+    const cpa = conversions > 0 ? cost / conversions : 0;
+    const roas = cost > 0 ? (revenue / cost) * 100 : 0;
+    
+    // --- Stateの更新処理（ここを修正） ---
+    setDailyResult({ impressions, clicks, conversions, cost, cpm, cpa, roas, revenue });
 
-    setDailyResult({
-      impressions,
-      clicks,
-      conversions,
-      cost,
-      cpm,
-      cpa,
-      roas,
-      revenue,
+    // 関数型のアップデートで、安全にStateを更新する
+    setDay(prevDay => {
+      const newDay = prevDay + 1;
+      if (newDay > 30) {
+        setGameOver(true);
+      }
+      return newDay;
+    });
+
+    setBudget(prevBudget => {
+      const newBudget = prevBudget - cost;
+      if (newBudget <= 0) {
+        setGameOver(true);
+      }
+      return newBudget;
     });
   };
-
 
   return (
     <div>
@@ -64,10 +72,11 @@ export default function GameScreen({ scenario, onBack }) {
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* ... (左カラム、右カラムの見た目は変更なし) ... */}
         <div className="md:col-span-1 bg-white p-4 rounded-lg shadow-md">
           <h3 className="font-bold mb-2">現在の状況</h3>
-          <p>経過日数: 1日目 / 30日</p>
-          <p>残り予算: ¥100,000</p>
+          <p>経過日数: {day}日目 / 30日</p>
+          <p>残り予算: {Math.floor(budget).toLocaleString()}円</p>
           
           {dailyResult && (
             <div className="mt-4 pt-4 border-t space-y-1">
@@ -85,7 +94,6 @@ export default function GameScreen({ scenario, onBack }) {
           )}
         </div>
 
-        {/* ... (右カラムのアクションエリアは変更なし) ... */}
         <div className="md:col-span-2 bg-white p-4 rounded-lg shadow-md space-y-6">
           <h3 className="font-bold mb-2">アクション</h3>
           
@@ -117,13 +125,18 @@ export default function GameScreen({ scenario, onBack }) {
         </div>
       </div>
 
-      {/* ... (ボタン部分は変更なし) ... */}
       <div className="mt-6 flex justify-between items-center">
         <button onClick={onBack} className="bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-700">
           シナリオ選択に戻る
         </button>
-        <button onClick={handleRunDay} className="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-800 text-lg">
-          この内容で1日運用する 🚀
+        <button 
+          onClick={handleRunDay}
+          disabled={gameOver}
+          className="bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg
+            disabled:bg-gray-400 disabled:cursor-not-allowed  
+            hover:bg-green-800"
+        >
+          {gameOver ? 'ゲームオーバー' : 'この内容で1日運用する 🚀'}
         </button>
       </div>
     </div>
