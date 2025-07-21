@@ -4,6 +4,21 @@
 
 import { useState } from 'react';
 
+// --- ここから型定義を追加 ---
+// シナリオデータの「型」を定義
+type Scenario = {
+  id: number;
+  title: string;
+  difficulty: string;
+};
+
+// GameScreenコンポーネントが受け取るPropsの「型」を定義
+type GameScreenProps = {
+  scenario: Scenario; // scenarioは上記のScenario型
+  onBack: () => void; // onBackは引数なし・戻り値なしの関数
+};
+// --- ここまで型定義を追加 ---
+
 const AVAILABLE_TAGS = ['20代女性', '30代男性', '学生', '主婦', 'ファッション', 'ガジェット', '都心在住', '地方在住', 'アウトドア', 'インドア'];
 const CREATIVE_CARDS = [
   { id: 1, title: 'A: 若者向け画像', description: 'インパクト重視のビジュアル' },
@@ -11,7 +26,8 @@ const CREATIVE_CARDS = [
   { id: 3, title: 'C: 機能性アピール', description: '製品の特長をテキストで訴求' },
 ];
 
-export default function GameScreen({ scenario, onBack }) {
+// コンポーネントの引数に、作成した型を適用する
+export default function GameScreen({ scenario, onBack }: GameScreenProps) {
   const [day, setDay] = useState(1);
   const [budget, setBudget] = useState(100000);
   const [gameOver, setGameOver] = useState(false);
@@ -20,7 +36,7 @@ export default function GameScreen({ scenario, onBack }) {
   const [selectedCreativeId, setSelectedCreativeId] = useState(null);
   const [dailyResult, setDailyResult] = useState(null);
 
-  const handleTagToggle = (tag) => {
+  const handleTagToggle = (tag: string) => { // tagにも型を指定
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter((t) => t !== tag));
     } else {
@@ -28,9 +44,7 @@ export default function GameScreen({ scenario, onBack }) {
     }
   };
 
-  // 「1日運用する」ボタンが押されたときの処理（修正版）
   const handleRunDay = () => {
-    // --- シミュレーションロジック ---
     const impressions = 10000;
     const clickRate = selectedCreativeId === 1 ? 0.05 : 0.02;
     const clicks = impressions * clickRate;
@@ -44,10 +58,8 @@ export default function GameScreen({ scenario, onBack }) {
     const cpa = conversions > 0 ? cost / conversions : 0;
     const roas = cost > 0 ? (revenue / cost) * 100 : 0;
     
-    // --- Stateの更新処理（ここを修正） ---
     setDailyResult({ impressions, clicks, conversions, cost, cpm, cpa, roas, revenue });
 
-    // 関数型のアップデートで、安全にStateを更新する
     setDay(prevDay => {
       const newDay = prevDay + 1;
       if (newDay > 30) {
@@ -66,13 +78,13 @@ export default function GameScreen({ scenario, onBack }) {
   };
 
   return (
+    // ... (returnの中身は変更なし) ...
     <div>
       <h2 className="text-2xl font-bold text-slate-800 mb-4">
         {scenario.title}
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* ... (左カラム、右カラムの見た目は変更なし) ... */}
         <div className="md:col-span-1 bg-white p-4 rounded-lg shadow-md">
           <h3 className="font-bold mb-2">現在の状況</h3>
           <p>経過日数: {day}日目 / 30日</p>
@@ -99,7 +111,7 @@ export default function GameScreen({ scenario, onBack }) {
           
           <div>
             <label htmlFor="bid" className="block font-medium mb-1">入札単価: <span className="font-bold text-blue-600">{bidAmount}円</span></label>
-            <input type="range" id="bid" min="10" max="500" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} className="w-full" />
+            <input type="range" id="bid" min="10" max="500" value={bidAmount} onChange={(e) => setBidAmount(Number(e.target.value))} className="w-full" />
           </div>
           
           <div>
