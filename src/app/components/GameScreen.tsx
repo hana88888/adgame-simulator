@@ -3,33 +3,16 @@
 'use client';
 
 import { useState } from 'react';
+// 型定義を外部ファイルからインポートする
+import { Scenario, DailyResult } from '@/types'; 
 
-// --- 型定義エリア ---
-type Scenario = {
-  id: number;
-  title: string;
-  difficulty: string;
-};
-
+// GameScreenが受け取るPropsの型定義
 type GameScreenProps = {
   scenario: Scenario;
   onBack: () => void;
 };
 
-// DailyResultの型を新たに追加
-type DailyResult = {
-  impressions: number;
-  clicks: number;
-  conversions: number;
-  cost: number;
-  cpm: number;
-  cpa: number;
-  roas: number;
-  revenue: number;
-};
-// --------------------
-
-// ... 定数定義は変更なし ...
+// ... (定数定義は変更なし) ...
 const AVAILABLE_TAGS = ['20代女性', '30代男性', '学生', '主婦', 'ファッション', 'ガジェット', '都心在住', '地方在住', 'アウトドア', 'インドア'];
 const CREATIVE_CARDS = [
   { id: 1, title: 'A: 若者向け画像', description: 'インパクト重視のビジュアル' },
@@ -37,21 +20,17 @@ const CREATIVE_CARDS = [
   { id: 3, title: 'C: 機能性アピール', description: '製品の特長をテキストで訴求' },
 ];
 
-
 export default function GameScreen({ scenario, onBack }: GameScreenProps) {
-  // ... 他のState定義 ...
   const [day, setDay] = useState(1);
   const [budget, setBudget] = useState(100000);
+  // ... (残りのState定義は変更なし) ...
   const [gameOver, setGameOver] = useState(false);
   const [bidAmount, setBidAmount] = useState(100);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedCreativeId, setSelectedCreativeId] = useState<number | null>(null);
-
-  // --- ここを修正 ---
   const [dailyResult, setDailyResult] = useState<DailyResult | null>(null);
-  // -----------------
 
-  // ... handleTagToggle, handleRunDay 関数は変更なし ...
+  // ... (残りのコードは変更なし) ...
   const handleTagToggle = (tag: string) => {
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter((t) => t !== tag));
@@ -92,7 +71,6 @@ export default function GameScreen({ scenario, onBack }: GameScreenProps) {
   };
 
   return (
-    // ... returnの中身は変更なし ...
     <div>
       <h2 className="text-2xl font-bold text-slate-800 mb-4">
         {scenario.title}

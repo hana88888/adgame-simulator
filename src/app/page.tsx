@@ -1,18 +1,24 @@
+// src/app/page.tsx
+
 'use client';
 
 import { useState } from 'react';
-import GameScreen from './components/GameScreen'; // 新しいコンポーネントをインポート
+import GameScreen from '@/components/GameScreen';
+// 型定義を外部ファイルからインポートする
+import { Scenario } from '@/types'; 
 
 export default function Home() {
-  const [selectedScenario, setSelectedScenario] = useState(null);
+  // selectedScenarioのStateにも型を指定する
+  const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
 
-  const scenarios = [
+  const scenarios: Scenario[] = [ // scenarios配列にも型を指定
     { id: 1, title: 'シナリオA：新作スニーカーを売れ！', difficulty: '★★☆' },
     { id: 2, title: 'シナリオB：老舗旅館の認知度アップ', difficulty: '★☆☆' },
     { id: 3, title: 'シナリオC：ニッチなSaaSを黒字化', difficulty: '★★★☆' },
   ];
   
-  const handleSelectScenario = (scenario) => {
+  // 関数の引数に、インポートしたScenario型を指定する
+  const handleSelectScenario = (scenario: Scenario) => {
     setSelectedScenario(scenario);
   };
 
@@ -24,13 +30,11 @@ export default function Home() {
         </h1>
         
         {selectedScenario ? (
-          // 「ゲーム画面」の表示を、新しいGameScreenコンポーネントに任せる
           <GameScreen 
             scenario={selectedScenario} 
             onBack={() => setSelectedScenario(null)} 
           />
         ) : (
-          // 「シナリオ選択画面」の表示
           <div>
             <h2 className="text-xl font-semibold text-slate-600 mb-8">
               シナリオを選択してください
