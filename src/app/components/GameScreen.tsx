@@ -1,20 +1,35 @@
-
 // src/components/GameScreen.tsx
 
 'use client';
 
 import { useState } from 'react';
 
-// ... (型の定義、定数の定義は変更なし) ...
+// --- 型定義エリア ---
 type Scenario = {
   id: number;
   title: string;
   difficulty: string;
 };
+
 type GameScreenProps = {
   scenario: Scenario;
   onBack: () => void;
 };
+
+// DailyResultの型を新たに追加
+type DailyResult = {
+  impressions: number;
+  clicks: number;
+  conversions: number;
+  cost: number;
+  cpm: number;
+  cpa: number;
+  roas: number;
+  revenue: number;
+};
+// --------------------
+
+// ... 定数定義は変更なし ...
 const AVAILABLE_TAGS = ['20代女性', '30代男性', '学生', '主婦', 'ファッション', 'ガジェット', '都心在住', '地方在住', 'アウトドア', 'インドア'];
 const CREATIVE_CARDS = [
   { id: 1, title: 'A: 若者向け画像', description: 'インパクト重視のビジュアル' },
@@ -24,20 +39,19 @@ const CREATIVE_CARDS = [
 
 
 export default function GameScreen({ scenario, onBack }: GameScreenProps) {
+  // ... 他のState定義 ...
   const [day, setDay] = useState(1);
   const [budget, setBudget] = useState(100000);
   const [gameOver, setGameOver] = useState(false);
   const [bidAmount, setBidAmount] = useState(100);
-  
-  // --- ここを修正 ---
-  // useStateに「これは文字列の配列です」と型を教える
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedCreativeId, setSelectedCreativeId] = useState<number | null>(null);
+
+  // --- ここを修正 ---
+  const [dailyResult, setDailyResult] = useState<DailyResult | null>(null);
   // -----------------
 
-  const [selectedCreativeId, setSelectedCreativeId] = useState<number | null>(null);
-  const [dailyResult, setDailyResult] = useState(null);
-
-  // ... (handleTagToggle, handleRunDay 関数は変更なし) ...
+  // ... handleTagToggle, handleRunDay 関数は変更なし ...
   const handleTagToggle = (tag: string) => {
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter((t) => t !== tag));
@@ -77,9 +91,8 @@ export default function GameScreen({ scenario, onBack }: GameScreenProps) {
     });
   };
 
-
   return (
-    // ... (returnの中身も変更なし) ...
+    // ... returnの中身は変更なし ...
     <div>
       <h2 className="text-2xl font-bold text-slate-800 mb-4">
         {scenario.title}
